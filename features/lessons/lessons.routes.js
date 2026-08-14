@@ -31,7 +31,7 @@ const uploadPdf = multer({
 });
 
 const uploadExcel = multer({
-  storage,
+  storage: multer.memoryStorage(), // langsung ke RAM, tidak simpan ke disk
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     const allowed = [

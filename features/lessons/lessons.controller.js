@@ -131,7 +131,8 @@ const importQuizFromExcel = async (req, res) => {
       return error(res, 'File Excel wajib diunggah', STATUS_CODES.BAD_REQUEST);
     }
 
-    const workbook = XLSX.readFile(req.file.path);
+    // Baca langsung dari buffer (memory) — tidak perlu file di disk
+    const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet);
 
