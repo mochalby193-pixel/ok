@@ -80,8 +80,8 @@ function App() {
           {/* ── Guru Routes ── */}
           <Route element={<AppLayout allowedRoles={[ROLES.GURU]} />}>
             <Route path="/guru/dashboard" element={<GuruDashboard />} />
-            <Route path="/admin/lessons" element={<ManageLessons />} />
-            <Route path="/admin/quizzes" element={<ManageQuizzes />} />
+            <Route path="/guru/lessons" element={<ManageLessons />} />
+            <Route path="/guru/quizzes" element={<ManageQuizzes />} />
           </Route>
 
           {/* ── Guru + Admin shared Routes ── */}

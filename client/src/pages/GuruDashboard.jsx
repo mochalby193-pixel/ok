@@ -182,7 +182,7 @@ export const GuruDashboard = () => {
         <section className="mb-10">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-700">📋 Mapel & Kelas Aktif</h2>
-            <Link to="/admin/lessons" className="text-sm text-primary hover:underline font-medium">
+            <Link to="/guru/lessons" className="text-sm text-primary hover:underline font-medium">
               Kelola Materi →
             </Link>
           </div>
@@ -415,14 +415,14 @@ export const GuruDashboard = () => {
           <div>
             <h2 className="text-xl font-bold text-gray-700 mb-4">⚡ Aksi Cepat</h2>
             <div className="grid grid-cols-1 gap-3">
-              <Link to="/admin/lessons" className="card border border-transparent hover:border-amber-300 flex items-center gap-4 transition-colors">
+              <Link to="/guru/lessons" className="card border border-transparent hover:border-amber-300 flex items-center gap-4 transition-colors">
                 <span className="text-3xl">📖</span>
                 <div>
                   <p className="font-semibold text-gray-800">Kelola Materi</p>
                   <p className="text-sm text-gray-500">Upload PDF, tambah video, atur konten.</p>
                 </div>
               </Link>
-              <Link to="/admin/quizzes" className="card border border-transparent hover:border-blue-300 flex items-center gap-4 transition-colors">
+              <Link to="/guru/quizzes" className="card border border-transparent hover:border-blue-300 flex items-center gap-4 transition-colors">
                 <span className="text-3xl">📝</span>
                 <div>
                   <p className="font-semibold text-gray-800">Kelola Kuis</p>
@@ -443,7 +443,7 @@ export const GuruDashboard = () => {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-700">📋 Materi Terbaru</h2>
-              <Link to="/admin/lessons" className="text-sm text-primary hover:underline font-medium">
+              <Link to="/guru/lessons" className="text-sm text-primary hover:underline font-medium">
                 Lihat semua →
               </Link>
             </div>
@@ -452,7 +452,7 @@ export const GuruDashboard = () => {
               <div className="card text-center py-10 border border-gray-100">
                 <div className="text-5xl mb-3">📂</div>
                 <p className="text-gray-500">Belum ada materi.</p>
-                <Link to="/admin/lessons" className="btn btn-secondary mt-4 inline-block text-sm px-5 py-2">
+                <Link to="/guru/lessons" className="btn btn-secondary mt-4 inline-block text-sm px-5 py-2">
                   Tambah Materi Pertama
                 </Link>
               </div>

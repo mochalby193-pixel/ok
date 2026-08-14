@@ -16,4 +16,6 @@ export const ROUTES = {
   MANAGE_LESSONS: '/admin/lessons',
   MANAGE_QUIZZES: '/admin/quizzes',
   MANAGE_USERS: '/admin/users',
+  GURU_LESSONS: '/guru/lessons',
+  GURU_QUIZZES: '/guru/quizzes',
 };

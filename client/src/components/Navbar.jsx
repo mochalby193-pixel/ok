@@ -16,8 +16,8 @@ const getMenuItems = (role) => {
   ];
   if (role === ROLES.GURU) return [
     { to: '/guru/dashboard',    label: 'Dashboard' },
-    { to: '/admin/lessons',     label: 'Materi' },
-    { to: '/admin/quizzes',     label: 'Kuis' },
+    { to: '/guru/lessons',      label: 'Materi' },
+    { to: '/guru/quizzes',      label: 'Kuis' },
     { to: '/guru/rekap-nilai',  label: 'Rekap Nilai' },
   ];
   if (role === ROLES.SISWA) return [
