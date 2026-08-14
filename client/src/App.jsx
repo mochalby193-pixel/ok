@@ -34,8 +34,8 @@ import { SuperAdminRequests } from './pages/SuperAdminRequests';
 import { SessionWarning } from './components/SessionWarning';
 
 // ─── Layout wrapper: Navbar + halaman + Footer ────────────────────────────────
-const AppLayout = ({ allowedRoles, requireSuperAdmin = false }) => (
-  <ProtectedRoute allowedRoles={allowedRoles} requireSuperAdmin={requireSuperAdmin}>
+const AppLayout = ({ allowedRoles, requireSuperAdmin = false, superAdminBlocked = false }) => (
+  <ProtectedRoute allowedRoles={allowedRoles} requireSuperAdmin={requireSuperAdmin} superAdminBlocked={superAdminBlocked}>
     <div className="min-h-screen flex flex-col">
       <SessionWarning />
       <Navbar />
@@ -112,12 +112,12 @@ function App() {
           </Route>
 
           {/* ── Guru + Admin shared Routes ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.GURU, ROLES.ADMIN]} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.GURU, ROLES.ADMIN]} superAdminBlocked={true} />}>
             <Route path="/guru/rekap-nilai" element={<RekapNilai />} />
           </Route>
 
           {/* ── Admin Routes ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} requireSuperAdmin={false} superAdminBlocked={true} />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/classes" element={<ManageClasses />} />
             <Route path="/admin/subjects" element={<ManageSubjects />} />
