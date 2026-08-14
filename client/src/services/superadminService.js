@@ -1,6 +1,9 @@
 import api from './api';
 
 export const superadminService = {
+  // Schools — superadmin read-only
+  getSchools: () => api.get('/superadmin/schools-list'),
+
   // Users — semua user semua sekolah
   getAllUsers: (params = {}) => {
     const q = new URLSearchParams();

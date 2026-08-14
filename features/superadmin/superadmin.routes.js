@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const ctrl = require('./superadmin.controller');
 const { authenticate, superAdminOnly, pengawasOnly } = require('../../shared/middleware/auth');
+const pengawasCtrl = require('../pengawas/pengawas.controller');
 
 // ─── Superadmin routes ────────────────────────────────────────────────────────
 router.get('/users',                authenticate, superAdminOnly, ctrl.getAllUsers);
@@ -16,5 +17,8 @@ router.post('/requests/:id/reject', authenticate, superAdminOnly, ctrl.rejectReq
 // ─── Pengawas routes (ajukan request) ────────────────────────────────────────
 router.post('/requests',            authenticate, pengawasOnly,   ctrl.createRequest);
 router.get('/my-requests',          authenticate, pengawasOnly,   ctrl.getMyRequests);
+
+// ─── Schools list untuk superadmin (read-only) ───────────────────────────────
+router.get('/schools-list',         authenticate, superAdminOnly, pengawasCtrl.getAllSchools);
 
 module.exports = router;

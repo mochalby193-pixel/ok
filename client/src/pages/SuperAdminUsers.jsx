@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { superadminService } from '../services/superadminService';
-import { pengawasService } from '../services/pengawasService';
 import { Loader } from '../components/Loader';
 import { Button } from '../components/Button';
 import { ConfirmModal } from '../components/ConfirmModal';
@@ -37,7 +36,7 @@ export const SuperAdminUsers = () => {
     try {
       const [u, s] = await Promise.all([
         superadminService.getAllUsers({ role: filterRole, search, school_id: filterSchool }),
-        pengawasService.getAllSchools(),
+        superadminService.getSchools(),
       ]);
       setUsers(u);
       setSchools(s);
