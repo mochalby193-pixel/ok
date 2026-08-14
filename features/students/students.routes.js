@@ -65,4 +65,10 @@ router.get('/lesson-scores', authenticate, siswaOnly, studentsController.getLess
  */
 router.get('/nilaiku', authenticate, siswaOnly, studentsController.getNilaiKu);
 
+/**
+ * GET /api/students/progress-list
+ * Daftar progress siswa untuk guru (guru only)
+ */
+router.get('/progress-list', authenticate, studentsController.getProgressList);
+
 module.exports = router;

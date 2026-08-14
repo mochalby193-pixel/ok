@@ -436,6 +436,13 @@ export const GuruDashboard = () => {
                   <p className="text-sm text-gray-500">Filter, unduh Excel rekap semua materi.</p>
                 </div>
               </Link>
+              <Link to="/guru/progress-siswa" className="card border border-transparent hover:border-purple-300 flex items-center gap-4 transition-colors bg-purple-50">
+                <span className="text-3xl">📋</span>
+                <div>
+                  <p className="font-semibold text-gray-800">Progress Siswa</p>
+                  <p className="text-sm text-gray-500">Lihat siapa yang sudah dan belum selesai.</p>
+                </div>
+              </Link>
             </div>
           </div>
 

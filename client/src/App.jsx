@@ -22,6 +22,7 @@ import { ManageAssignments } from './pages/ManageAssignments';
 import { GuruDashboard } from './pages/GuruDashboard';
 import { RekapNilai } from './pages/RekapNilai';
 import { NilaiKu } from './pages/NilaiKu';
+import { ProgressSiswa } from './pages/ProgressSiswa';
 
 import { SessionWarning } from './components/SessionWarning';
 
@@ -82,6 +83,7 @@ function App() {
             <Route path="/guru/dashboard" element={<GuruDashboard />} />
             <Route path="/guru/lessons" element={<ManageLessons />} />
             <Route path="/guru/quizzes" element={<ManageQuizzes />} />
+            <Route path="/guru/progress-siswa" element={<ProgressSiswa />} />
           </Route>
 
           {/* ── Guru + Admin shared Routes ── */}

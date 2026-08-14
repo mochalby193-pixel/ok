@@ -229,6 +229,56 @@ const getNilaiKu = async (studentId) => {
   return result.rows;
 };
 
+/**
+ * Get student progress list for teacher
+ * Returns: nama_siswa, nama_kelas, nama_mapel, lesson progress per student
+ * Filtered by teacherId, optional class_id and subject_id
+ */
+const getStudentProgressForTeacher = async ({ teacherId, classId, subjectId }) => {
+  const params = [teacherId];
+  let filters = '';
+
+  if (classId) {
+    params.push(classId);
+    filters += ` AND c.id = $${params.length}`;
+  }
+
+  if (subjectId) {
+    params.push(subjectId);
+    filters += ` AND s.id = $${params.length}`;
+  }
+
+  const result = await query(
+    `SELECT
+       u.nama                          AS nama_siswa,
+       c.id                            AS class_id,
+       c.nama_kelas,
+       s.id                            AS subject_id,
+       s.nama_mapel,
+       l.id                            AS lesson_id,
+       l.judul_bab,
+       l.urutan,
+       COALESCE(sp.is_completed, false) AS is_completed,
+       sp.completed_at
+     FROM class_subjects cs
+     JOIN classes c   ON cs.class_id   = c.id
+     JOIN subjects s  ON cs.subject_id = s.id
+     JOIN lessons l   ON l.class_subject_id = cs.id AND l.is_published = true
+     JOIN students st ON st.class_id = c.id
+     JOIN users u     ON st.user_id = u.id AND u.is_active = true
+     LEFT JOIN student_progress sp
+               ON sp.student_id = st.id AND sp.lesson_id = l.id
+     WHERE cs.teacher_id = $1
+       AND cs.is_active = true
+       AND c.is_active = true
+       AND s.is_active = true
+       ${filters}
+     ORDER BY c.nama_kelas, s.nama_mapel, u.nama, l.urutan`,
+    params
+  );
+  return result.rows;
+};
+
 module.exports = {
   getStudentDashboard,
   getLessonProgress,
@@ -238,4 +288,5 @@ module.exports = {
   getQuizScoresByLesson,
   getLessonScoreSummary,
   getNilaiKu,
+  getStudentProgressForTeacher,
 };

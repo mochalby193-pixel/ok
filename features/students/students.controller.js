@@ -183,6 +183,28 @@ const getNilaiKu = async (req, res) => {
   }
 };
 
+/**
+ * Get student progress list for teacher
+ * GET /api/students/progress-list?class_id=&subject_id=
+ */
+const getProgressList = async (req, res) => {
+  try {
+    const teacherId = req.user.id;
+    const { class_id, subject_id } = req.query;
+
+    const rows = await studentsService.getStudentProgressForTeacher({
+      teacherId,
+      classId: class_id || null,
+      subjectId: subject_id || null,
+    });
+
+    return success(res, rows, 'Progress list retrieved');
+  } catch (err) {
+    console.error('Get progress list error:', err);
+    return error(res, 'Failed to get progress list', STATUS_CODES.INTERNAL_SERVER_ERROR);
+  }
+};
+
 module.exports = {
   getDashboard,
   getLessonProgress,
@@ -192,4 +214,5 @@ module.exports = {
   getQuizScores,
   getLessonScores,
   getNilaiKu,
+  getProgressList,
 };

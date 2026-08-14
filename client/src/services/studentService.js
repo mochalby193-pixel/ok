@@ -38,4 +38,9 @@ export const studentService = {
   getNilaiKu: async () => {
     return await api.get('/students/nilaiku');
   },
+
+  // Untuk guru — daftar progress siswa
+  getProgressList: async (queryString = '') => {
+    return await api.get(`/students/progress-list${queryString ? '?' + queryString : ''}`);
+  },
 };

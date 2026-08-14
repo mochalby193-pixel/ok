@@ -15,10 +15,11 @@ const getMenuItems = (role) => {
     { to: '/admin/users',       label: 'Pengguna' },
   ];
   if (role === ROLES.GURU) return [
-    { to: '/guru/dashboard',    label: 'Dashboard' },
-    { to: '/guru/lessons',      label: 'Materi' },
-    { to: '/guru/quizzes',      label: 'Kuis' },
-    { to: '/guru/rekap-nilai',  label: 'Rekap Nilai' },
+    { to: '/guru/dashboard',        label: 'Dashboard' },
+    { to: '/guru/lessons',          label: 'Materi' },
+    { to: '/guru/quizzes',          label: 'Kuis' },
+    { to: '/guru/progress-siswa',   label: 'Progress Siswa' },
+    { to: '/guru/rekap-nilai',      label: 'Rekap Nilai' },
   ];
   if (role === ROLES.SISWA) return [
     { to: '/student/dashboard', label: 'Dashboard' },
