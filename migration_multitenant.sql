@@ -64,6 +64,7 @@ UPDATE subjects SET school_id = 1 WHERE school_id IS NULL;
 
 -- 10. Ubah UNIQUE constraint subjects agar per sekolah
 ALTER TABLE subjects DROP CONSTRAINT IF EXISTS subjects_nama_mapel_key;
+ALTER TABLE subjects DROP CONSTRAINT IF EXISTS subjects_school_nama_unique;
 ALTER TABLE subjects ADD CONSTRAINT subjects_school_nama_unique
     UNIQUE (school_id, nama_mapel);
 
