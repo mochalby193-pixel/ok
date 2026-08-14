@@ -29,25 +29,29 @@ export const userManagementService = {
 
   // ── Excel ──────────────────────────────────────────────────────
   downloadTemplate: () => {
-    // Direct browser download — bypass axios interceptor
     const token = localStorage.getItem('token');
-    const base = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-    const url = `${base}/admin/users/template`;
+    // Pakai relative URL agar bekerja di development maupun production
+    const url = `/api/admin/users/template`;
 
-    const a = document.createElement('a');
-    a.href = url;
-    // Add token via URL won't work for auth header; use fetch + blob instead
     fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      .then((r) => r.blob())
+      .then(async (r) => {
+        if (!r.ok) {
+          const data = await r.json().catch(() => ({}));
+          throw new Error(data.message || 'Gagal mengunduh template');
+        }
+        return r.blob();
+      })
       .then((blob) => {
         const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
         a.href = blobUrl;
         a.download = 'template_import_users.xlsx';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(blobUrl);
-      });
+      })
+      .catch((err) => alert('Gagal unduh template: ' + err.message));
   },
 
   uploadExcel: async (file) => {
