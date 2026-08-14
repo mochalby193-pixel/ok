@@ -12,9 +12,11 @@ export const superadminService = {
     if (params.school_id) q.append('school_id', params.school_id);
     return api.get(`/superadmin/users?${q.toString()}`);
   },
-  getUserById:  (id)       => api.get(`/superadmin/users/${id}`),
-  updateUser:   (id, data) => api.put(`/superadmin/users/${id}`, data),
-  deleteUser:   (id)       => api.delete(`/superadmin/users/${id}`),
+  getUserById:    (id)       => api.get(`/superadmin/users/${id}`),
+  createUser:     (data)     => api.post('/superadmin/users', data),
+  updateUser:     (id, data) => api.put(`/superadmin/users/${id}`, data),
+  deleteUser:     (id)       => api.delete(`/superadmin/users/${id}`),
+  hardDeleteUser: (id)       => api.delete(`/superadmin/users/${id}/hard`),
 
   // Requests — superadmin kelola
   getRequests:     ()            => api.get('/superadmin/requests'),

@@ -74,6 +74,51 @@ const deleteUser = async (id) => {
   await query('UPDATE users SET is_active = false WHERE id = $1', [id]);
 };
 
+// Hapus permanen — hanya superadmin
+const hardDeleteUser = async (id) => {
+  await query('DELETE FROM users WHERE id = $1 AND role != \'superadmin\'', [id]);
+};
+
+// Tambah user baru — superadmin bisa buat user di sekolah mana saja
+const createUser = async ({ school_id, nama, email, password, role, nis, nisn, class_id }) => {
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+
+    const dup = await client.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (dup.rows.length > 0) throw new Error('Email sudah terdaftar');
+
+    if (role === 'siswa' && nisn) {
+      const dupNisn = await client.query('SELECT id FROM students WHERE nisn = $1', [nisn]);
+      if (dupNisn.rows.length > 0) throw new Error('NISN sudah terdaftar');
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const userRes = await client.query(
+      `INSERT INTO users (school_id, nama, email, password, role)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, nama, email, role, school_id`,
+      [school_id || null, nama, email, hashed, role]
+    );
+    const newUser = userRes.rows[0];
+
+    if (role === 'siswa') {
+      await client.query(
+        `INSERT INTO students (user_id, class_id, nis, nisn) VALUES ($1, $2, $3, $4)`,
+        [newUser.id, class_id || null, nis || null, nisn || null]
+      );
+    }
+
+    await client.query('COMMIT');
+    return newUser;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
 // ─── USER REQUESTS ────────────────────────────────────────────────────────────
 
 const getPendingRequests = async () => {
@@ -177,7 +222,7 @@ const getMyRequests = async (requestedBy) => {
 };
 
 module.exports = {
-  getAllUsers, getUserById, updateUser, deleteUser,
+  getAllUsers, getUserById, createUser, updateUser, deleteUser, hardDeleteUser,
   getPendingRequests, approveRequest, rejectRequest,
   createRequest, getMyRequests,
 };

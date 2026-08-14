@@ -53,7 +53,35 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// ─── REQUESTS ─────────────────────────────────────────────────────────────────
+const createUser = async (req, res) => {
+  try {
+    const { school_id, nama, email, password, role, nis, nisn, class_id } = req.body;
+    if (!nama || !email || !password || !role) {
+      return error(res, 'nama, email, password, role wajib diisi', STATUS_CODES.BAD_REQUEST);
+    }
+    if (password.length < 6) return error(res, 'Password minimal 6 karakter', STATUS_CODES.BAD_REQUEST);
+    if (role === 'superadmin') return error(res, 'Tidak bisa membuat akun superadmin baru', STATUS_CODES.FORBIDDEN);
+    const newUser = await svc.createUser({ school_id, nama, email, password, role, nis, nisn, class_id });
+    return success(res, newUser, 'User created', STATUS_CODES.CREATED);
+  } catch (err) {
+    if (err.message.includes('Email') || err.message.includes('NISN')) {
+      return error(res, err.message, STATUS_CODES.CONFLICT);
+    }
+    return error(res, 'Failed to create user', STATUS_CODES.INTERNAL_SERVER_ERROR);
+  }
+};
+
+const hardDeleteUser = async (req, res) => {
+  try {
+    const target = await svc.getUserById(req.params.id);
+    if (!target) return error(res, 'User not found', STATUS_CODES.NOT_FOUND);
+    if (target.role === 'superadmin') return error(res, 'Tidak bisa menghapus akun superadmin', STATUS_CODES.FORBIDDEN);
+    await svc.hardDeleteUser(req.params.id);
+    return success(res, null, 'User deleted permanently');
+  } catch (err) {
+    return error(res, 'Failed to delete user', STATUS_CODES.INTERNAL_SERVER_ERROR);
+  }
+};
 const getPendingRequests = async (req, res) => {
   try {
     const requests = await svc.getPendingRequests();
@@ -115,7 +143,7 @@ const getMyRequests = async (req, res) => {
 };
 
 module.exports = {
-  getAllUsers, getUserById, updateUser, deleteUser,
+  getAllUsers, getUserById, createUser, updateUser, deleteUser, hardDeleteUser,
   getPendingRequests, approveRequest, rejectRequest,
   createRequest, getMyRequests,
 };
