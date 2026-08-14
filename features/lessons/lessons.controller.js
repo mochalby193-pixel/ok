@@ -327,7 +327,8 @@ const downloadStudentScores = async (req, res) => {
 };
 
 // ─── DOWNLOAD QUIZ TEMPLATE ───────────────────────────────────────────────────
-const downloadQuizTemplate = async (req, res) => {  try {
+const downloadQuizTemplate = async (req, res) => {
+  try {
     const templateData = [
       {
         pertanyaan: 'Contoh soal nomor 1?',

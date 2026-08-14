@@ -68,21 +68,27 @@ export const lessonService = {
 
   downloadQuizTemplate: () => {
     const token = localStorage.getItem('token');
-    const link = document.createElement('a');
-    link.href = `${API_BASE_URL}/lessons/quiz-template`;
-    link.setAttribute('download', 'template_kuis.xlsx');
     fetch(`${API_BASE_URL}/lessons/quiz-template`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.blob())
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.message || 'Gagal mengunduh template');
+        }
+        return res.blob();
+      })
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const a = document.createElement('a');
+        a.href = url;
+        a.setAttribute('download', 'template_kuis.xlsx');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-      });
+      })
+      .catch((err) => alert('Gagal unduh template: ' + err.message));
   },
 
   /**
