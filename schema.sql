@@ -268,7 +268,7 @@ INSERT INTO users (school_id, nama, email, password, role) VALUES
 -- Super Admin (school_id = 1)
 -- superadmin@lms.com / ADMIN123
 INSERT INTO users (school_id, nama, email, password, role, is_superadmin) VALUES
-(1, 'Super Admin', 'superadmin@lms.com', '$2b$10$kP8/ItWB.HOt8xNNoijJJeVXkqyuJxwEeP1g5qHQJWvRoR3Bqz1Aa', 'admin', TRUE);
+(1, 'Super Admin', 'superadmin@lms.com', '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.', 'admin', TRUE);
 
 -- Admin sekolah pertama (school_id = 1)
 -- admin@lms.com / admin123

@@ -83,9 +83,10 @@ ON CONFLICT (email) DO NOTHING;
 -- 13. Insert superadmin (password: ADMIN123)
 INSERT INTO users (school_id, nama, email, password, role)
 VALUES (1, 'Super Admin', 'superadmin@lms.com',
-        '$2b$10$kP8/ItWB.HOt8xNNoijJJeVXkqyuJxwEeP1g5qHQJWvRoR3Bqz1Aa',
+        '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.',
         'admin')
-ON CONFLICT (email) DO NOTHING;
+ON CONFLICT (email) DO UPDATE SET
+    password = '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.';
 
 -- 14. Tambah flag is_superadmin ke users
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
