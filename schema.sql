@@ -270,8 +270,8 @@ INSERT INTO classes (school_id, nama_kelas, tingkat, deskripsi) VALUES
 
 -- Students
 INSERT INTO students (user_id, class_id, nis, nisn) VALUES
-(8, 1, '2024001', '1234567890'),
-(9, 1, '2024002', '0987654321');
+(7, 1, '2024001', '1234567890'),
+(8, 1, '2024002', '0987654321');
 
 -- Subjects (school_id = 1)
 INSERT INTO subjects (school_id, nama_mapel, deskripsi) VALUES
