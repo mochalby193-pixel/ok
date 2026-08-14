@@ -66,10 +66,22 @@ const adminOnly = authorize(ROLES.ADMIN);
  */
 const siswaOnly = authorize(ROLES.SISWA);
 
+/**
+ * Middleware for pengawas only
+ */
+const pengawasOnly = authorize(ROLES.PENGAWAS);
+
+/**
+ * Middleware for pengawas or admin
+ */
+const pengawasOrAdmin = authorize(ROLES.PENGAWAS, ROLES.ADMIN);
+
 module.exports = {
   authenticate,
   authorize,
   adminOrGuruOnly,
   adminOnly,
   siswaOnly,
+  pengawasOnly,
+  pengawasOrAdmin,
 };

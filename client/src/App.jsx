@@ -23,6 +23,9 @@ import { GuruDashboard } from './pages/GuruDashboard';
 import { RekapNilai } from './pages/RekapNilai';
 import { NilaiKu } from './pages/NilaiKu';
 import { ProgressSiswa } from './pages/ProgressSiswa';
+import { PengawasDashboard } from './pages/PengawasDashboard';
+import { PengawasSchoolDetail } from './pages/PengawasSchoolDetail';
+import { PengawasSchoolScores } from './pages/PengawasSchoolScores';
 
 import { SessionWarning } from './components/SessionWarning';
 
@@ -45,18 +48,19 @@ const RootRedirect = () => {
   const { user, isAuthenticated, loading } = useAuth();
   if (loading) return null;
   if (!isAuthenticated) return <LandingPage />;
-  if (user.role === ROLES.SISWA) return <Navigate to="/student/dashboard" replace />;
-  if (user.role === ROLES.GURU) return <Navigate to="/guru/dashboard" replace />;
+  if (user.role === ROLES.SISWA)    return <Navigate to="/student/dashboard" replace />;
+  if (user.role === ROLES.GURU)     return <Navigate to="/guru/dashboard" replace />;
+  if (user.role === ROLES.PENGAWAS) return <Navigate to="/pengawas/dashboard" replace />;
   return <Navigate to="/admin/dashboard" replace />;
 };
 
-// Jika sudah login, redirect ke dashboard; jika belum, tampilkan Login
 const PublicRoute = ({ children }) => {
   const { user, isAuthenticated, loading } = useAuth();
   if (loading) return null;
   if (isAuthenticated) {
-    if (user.role === ROLES.SISWA) return <Navigate to="/student/dashboard" replace />;
-    if (user.role === ROLES.GURU) return <Navigate to="/guru/dashboard" replace />;
+    if (user.role === ROLES.SISWA)    return <Navigate to="/student/dashboard" replace />;
+    if (user.role === ROLES.GURU)     return <Navigate to="/guru/dashboard" replace />;
+    if (user.role === ROLES.PENGAWAS) return <Navigate to="/pengawas/dashboard" replace />;
     return <Navigate to="/admin/dashboard" replace />;
   }
   return children;
@@ -70,6 +74,13 @@ function App() {
           {/* ── Public Routes (tanpa Footer) ── */}
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/" element={<RootRedirect />} />
+
+          {/* ── Pengawas Routes ── */}
+          <Route element={<AppLayout allowedRoles={[ROLES.PENGAWAS]} />}>
+            <Route path="/pengawas/dashboard" element={<PengawasDashboard />} />
+            <Route path="/pengawas/schools/:id" element={<PengawasSchoolDetail />} />
+            <Route path="/pengawas/schools/:id/scores" element={<PengawasSchoolScores />} />
+          </Route>
 
           {/* ── Student Routes ── */}
           <Route element={<AppLayout allowedRoles={[ROLES.SISWA]} />}>
@@ -101,7 +112,7 @@ function App() {
           </Route>
 
           {/* ── Profile (semua role) ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN, ROLES.GURU, ROLES.SISWA]} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.PENGAWAS, ROLES.ADMIN, ROLES.GURU, ROLES.SISWA]} />}>
             <Route path="/profile" element={<Profile />} />
           </Route>
 

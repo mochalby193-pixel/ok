@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const { query, getClient } = require('../../config/database');
 
 /**
- * Find user by email
+ * Find user by email (include school_id)
  */
 const findUserByEmail = async (email) => {
   const result = await query(
@@ -16,7 +16,7 @@ const findUserByEmail = async (email) => {
 };
 
 /**
- * Find siswa by NISN
+ * Find siswa by NISN (include school_id)
  */
 const findUserByNisn = async (nisn) => {
   const result = await query(
@@ -30,11 +30,11 @@ const findUserByNisn = async (nisn) => {
 };
 
 /**
- * Find user by ID with additional info
+ * Find user by ID with additional info (include school_id)
  */
 const findUserById = async (userId) => {
   const result = await query(
-    `SELECT u.id, u.nama, u.email, u.role, u.is_active,
+    `SELECT u.id, u.nama, u.email, u.role, u.is_active, u.school_id,
             s.id as student_id, s.class_id, s.nisn
      FROM users u
      LEFT JOIN students s ON u.id = s.user_id
@@ -60,38 +60,33 @@ const hashPassword = async (password) => {
 };
 
 /**
- * Register new user with transaction
+ * Register new user with transaction (include school_id)
  */
 const registerUser = async (userData) => {
   const client = await getClient();
-  
+
   try {
     await client.query('BEGIN');
-    
-    // Check if email already exists
+
     const existingUser = await client.query(
       'SELECT id FROM users WHERE email = $1',
       [userData.email]
     );
-    
     if (existingUser.rows.length > 0) {
       throw new Error('Email already registered');
     }
-    
-    // Hash password
+
     const hashedPassword = await hashPassword(userData.password);
-    
-    // Insert user
+
     const userResult = await client.query(
-      `INSERT INTO users (nama, email, password, role)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id, nama, email, role`,
-      [userData.nama, userData.email, hashedPassword, userData.role]
+      `INSERT INTO users (school_id, nama, email, password, role)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, nama, email, role, school_id`,
+      [userData.school_id || null, userData.nama, userData.email, hashedPassword, userData.role]
     );
-    
+
     const newUser = userResult.rows[0];
-    
-    // If role is siswa, create student record
+
     if (userData.role === 'siswa' && userData.class_id) {
       await client.query(
         `INSERT INTO students (user_id, class_id, nis, nisn)
@@ -99,10 +94,10 @@ const registerUser = async (userData) => {
         [newUser.id, userData.class_id, userData.nis || null, userData.nisn || null]
       );
     }
-    
+
     await client.query('COMMIT');
     return newUser;
-    
+
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;
@@ -115,7 +110,6 @@ const registerUser = async (userData) => {
  * Update user profile (nama, email)
  */
 const updateProfile = async (userId, { nama, email }) => {
-  // Check email uniqueness if changing
   if (email) {
     const existing = await query(
       'SELECT id FROM users WHERE email = $1 AND id <> $2',

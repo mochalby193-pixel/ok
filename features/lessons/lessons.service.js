@@ -1,6 +1,6 @@
 const { query } = require('../../config/database');
 
-const getAllLessons = async (classSubjectId, teacherId = null) => {
+const getAllLessons = async (classSubjectId, teacherId = null, schoolId = null) => {
   let sql = `SELECT l.*, s.nama_mapel, c.nama_kelas
              FROM lessons l
              JOIN class_subjects cs ON l.class_subject_id = cs.id
@@ -10,18 +10,20 @@ const getAllLessons = async (classSubjectId, teacherId = null) => {
 
   const params = [];
 
+  if (schoolId) {
+    params.push(schoolId);
+    sql += ` AND c.school_id = $${params.length}`;
+  }
   if (teacherId) {
     params.push(teacherId);
     sql += ` AND cs.teacher_id = $${params.length}`;
   }
-
   if (classSubjectId) {
     params.push(classSubjectId);
     sql += ` AND l.class_subject_id = $${params.length}`;
   }
 
   sql += ` ORDER BY l.urutan, l.created_at`;
-
   const result = await query(sql, params);
   return result.rows;
 };
@@ -39,8 +41,7 @@ const getLessonById = async (lessonId) => {
   return result.rows[0];
 };
 
-// Hanya kembalikan class_subjects milik guru yang login (jika role=guru)
-const getClassSubjects = async (teacherId = null) => {
+const getClassSubjects = async (teacherId = null, schoolId = null) => {
   let sql = `SELECT cs.id, cs.class_id, cs.subject_id, c.nama_kelas, c.tingkat, s.nama_mapel
              FROM class_subjects cs
              JOIN classes c ON cs.class_id = c.id
@@ -49,13 +50,16 @@ const getClassSubjects = async (teacherId = null) => {
 
   const params = [];
 
+  if (schoolId) {
+    params.push(schoolId);
+    sql += ` AND c.school_id = $${params.length}`;
+  }
   if (teacherId) {
     params.push(teacherId);
     sql += ` AND cs.teacher_id = $${params.length}`;
   }
 
   sql += ` ORDER BY c.tingkat, c.nama_kelas, s.nama_mapel`;
-
   const result = await query(sql, params);
   return result.rows;
 };
@@ -238,23 +242,15 @@ const getAllLessonsScores = async ({ teacherId = null, lessonId = null } = {}) =
   return result.rows;
 };
 
-/**
- * Hitung jumlah siswa aktif per class_subject
- * Bergabung lewat: class_subjects → classes → students
- * Bisa difilter by teacherId agar guru hanya lihat miliknya
- */
-const getStudentCountPerClassSubject = async (teacherId = null) => {
+const getStudentCountPerClassSubject = async (teacherId = null, schoolId = null) => {
   const params = [];
   let where = 'WHERE c.is_active = true AND s.is_active = true';
 
-  if (teacherId) {
-    params.push(teacherId);
-    where += ` AND cs.teacher_id = $${params.length}`;
-  }
+  if (schoolId) { params.push(schoolId); where += ` AND c.school_id = $${params.length}`; }
+  if (teacherId) { params.push(teacherId); where += ` AND cs.teacher_id = $${params.length}`; }
 
   const result = await query(
-    `SELECT cs.id AS class_subject_id,
-            COUNT(st.id) AS jumlah_siswa
+    `SELECT cs.id AS class_subject_id, COUNT(st.id) AS jumlah_siswa
      FROM class_subjects cs
      JOIN classes c  ON cs.class_id  = c.id
      JOIN subjects s ON cs.subject_id = s.id
@@ -263,26 +259,18 @@ const getStudentCountPerClassSubject = async (teacherId = null) => {
      GROUP BY cs.id`,
     params
   );
-  return result.rows; // [{ class_subject_id, jumlah_siswa }]
+  return result.rows;
 };
 
-/**
- * Hitung jumlah siswa yang sudah mengerjakan minimal 1 kuis
- * di setiap class_subject (bukan per materi).
- * Digunakan untuk kolom "Sudah Kerjakan" di dashboard guru.
- */
-const getSudahKerjakanPerClassSubject = async (teacherId = null) => {
+const getSudahKerjakanPerClassSubject = async (teacherId = null, schoolId = null) => {
   const params = [];
   let where = 'WHERE c.is_active = true AND s.is_active = true';
 
-  if (teacherId) {
-    params.push(teacherId);
-    where += ` AND cs.teacher_id = $${params.length}`;
-  }
+  if (schoolId) { params.push(schoolId); where += ` AND c.school_id = $${params.length}`; }
+  if (teacherId) { params.push(teacherId); where += ` AND cs.teacher_id = $${params.length}`; }
 
   const result = await query(
-    `SELECT cs.id AS class_subject_id,
-            COUNT(DISTINCT st.id) AS sudah_kerjakan
+    `SELECT cs.id AS class_subject_id, COUNT(DISTINCT st.id) AS sudah_kerjakan
      FROM class_subjects cs
      JOIN classes  c  ON cs.class_id   = c.id
      JOIN subjects s  ON cs.subject_id = s.id
@@ -294,7 +282,7 @@ const getSudahKerjakanPerClassSubject = async (teacherId = null) => {
      GROUP BY cs.id`,
     params
   );
-  return result.rows; // [{ class_subject_id, sudah_kerjakan }]
+  return result.rows;
 };
 
 module.exports = {

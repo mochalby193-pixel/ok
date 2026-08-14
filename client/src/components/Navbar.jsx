@@ -3,10 +3,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROLES } from '../utils/constants';
 
-const ROLE_LABEL = { admin: 'Admin', guru: 'Guru', siswa: 'Siswa' };
+const ROLE_LABEL = { pengawas: 'Pengawas', admin: 'Admin', guru: 'Guru', siswa: 'Siswa' };
 
-// Kumpulkan menu per role di satu tempat agar tidak duplikasi
 const getMenuItems = (role) => {
+  if (role === ROLES.PENGAWAS) return [
+    { to: '/pengawas/dashboard', label: 'Dashboard' },
+  ];
   if (role === ROLES.ADMIN) return [
     { to: '/admin/dashboard',   label: 'Dashboard' },
     { to: '/admin/classes',     label: 'Kelas' },

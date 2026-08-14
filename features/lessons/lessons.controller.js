@@ -8,9 +8,9 @@ const lessonsService = require('./lessons.service');
 const getAllLessons = async (req, res) => {
   try {
     const { class_subject_id } = req.query;
-    // Guru hanya lihat materi dari penugasannya
     const teacherId = req.user.role === 'guru' ? req.user.id : null;
-    const lessons = await lessonsService.getAllLessons(class_subject_id, teacherId);
+    const schoolId = req.user.school_id;
+    const lessons = await lessonsService.getAllLessons(class_subject_id, teacherId, schoolId);
     return success(res, lessons, 'Lessons retrieved successfully');
   } catch (err) {
     console.error('Get lessons error:', err);
@@ -34,9 +34,9 @@ const getLessonById = async (req, res) => {
 // ─── GET CLASS SUBJECTS DROPDOWN ──────────────────────────────────────────────
 const getClassSubjects = async (req, res) => {
   try {
-    // Guru hanya lihat penugasan miliknya sendiri
     const teacherId = req.user.role === 'guru' ? req.user.id : null;
-    const classSubjects = await lessonsService.getClassSubjects(teacherId);
+    const schoolId = req.user.school_id;
+    const classSubjects = await lessonsService.getClassSubjects(teacherId, schoolId);
     return success(res, classSubjects, 'Class subjects retrieved successfully');
   } catch (err) {
     console.error('Get class subjects error:', err);
@@ -182,7 +182,8 @@ const importQuizFromExcel = async (req, res) => {
 const getStudentCounts = async (req, res) => {
   try {
     const teacherId = req.user.role === 'guru' ? req.user.id : null;
-    const counts = await lessonsService.getStudentCountPerClassSubject(teacherId);
+    const schoolId = req.user.school_id;
+    const counts = await lessonsService.getStudentCountPerClassSubject(teacherId, schoolId);
     return success(res, counts, 'Student counts retrieved successfully');
   } catch (err) {
     console.error('Get student counts error:', err);
@@ -190,16 +191,11 @@ const getStudentCounts = async (req, res) => {
   }
 };
 
-// ─── SUDAH KERJAKAN PER CLASS SUBJECT ────────────────────────────────────────
-/**
- * GET /api/lessons/sudah-kerjakan
- * Mengembalikan jumlah siswa yang sudah mengerjakan minimal 1 kuis
- * per class_subject. Guru hanya melihat miliknya.
- */
 const getSudahKerjakan = async (req, res) => {
   try {
     const teacherId = req.user.role === 'guru' ? req.user.id : null;
-    const counts = await lessonsService.getSudahKerjakanPerClassSubject(teacherId);
+    const schoolId = req.user.school_id;
+    const counts = await lessonsService.getSudahKerjakanPerClassSubject(teacherId, schoolId);
     return success(res, counts, 'Sudah kerjakan counts retrieved successfully');
   } catch (err) {
     console.error('Get sudah kerjakan error:', err);

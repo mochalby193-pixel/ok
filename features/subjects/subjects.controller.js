@@ -4,7 +4,8 @@ const subjectsService = require('./subjects.service');
 
 const getAllSubjects = async (req, res) => {
   try {
-    const subjects = await subjectsService.getAllSubjects();
+    const schoolId = req.user.school_id;
+    const subjects = await subjectsService.getAllSubjects(schoolId);
     return success(res, subjects, 'Subjects retrieved successfully');
   } catch (err) {
     console.error('Get subjects error:', err);
@@ -14,13 +15,10 @@ const getAllSubjects = async (req, res) => {
 
 const getSubjectById = async (req, res) => {
   try {
+    const schoolId = req.user.school_id;
     const { id } = req.params;
-    const subject = await subjectsService.getSubjectById(id);
-    
-    if (!subject) {
-      return error(res, 'Subject not found', STATUS_CODES.NOT_FOUND);
-    }
-    
+    const subject = await subjectsService.getSubjectById(id, schoolId);
+    if (!subject) return error(res, 'Subject not found', STATUS_CODES.NOT_FOUND);
     return success(res, subject, 'Subject retrieved successfully');
   } catch (err) {
     console.error('Get subject error:', err);
@@ -30,9 +28,8 @@ const getSubjectById = async (req, res) => {
 
 const createSubject = async (req, res) => {
   try {
-    const subjectData = req.body;
-    const newSubject = await subjectsService.createSubject(subjectData);
-    
+    const schoolId = req.user.school_id;
+    const newSubject = await subjectsService.createSubject(req.body, schoolId);
     return success(res, newSubject, 'Subject created successfully', STATUS_CODES.CREATED);
   } catch (err) {
     console.error('Create subject error:', err);
@@ -42,15 +39,10 @@ const createSubject = async (req, res) => {
 
 const updateSubject = async (req, res) => {
   try {
+    const schoolId = req.user.school_id;
     const { id } = req.params;
-    const subjectData = req.body;
-    
-    const updatedSubject = await subjectsService.updateSubject(id, subjectData);
-    
-    if (!updatedSubject) {
-      return error(res, 'Subject not found', STATUS_CODES.NOT_FOUND);
-    }
-    
+    const updatedSubject = await subjectsService.updateSubject(id, req.body, schoolId);
+    if (!updatedSubject) return error(res, 'Subject not found', STATUS_CODES.NOT_FOUND);
     return success(res, updatedSubject, 'Subject updated successfully');
   } catch (err) {
     console.error('Update subject error:', err);
@@ -60,13 +52,10 @@ const updateSubject = async (req, res) => {
 
 const deleteSubject = async (req, res) => {
   try {
+    const schoolId = req.user.school_id;
     const { id } = req.params;
-    const deletedSubject = await subjectsService.deleteSubject(id);
-    
-    if (!deletedSubject) {
-      return error(res, 'Subject not found', STATUS_CODES.NOT_FOUND);
-    }
-    
+    const deletedSubject = await subjectsService.deleteSubject(id, schoolId);
+    if (!deletedSubject) return error(res, 'Subject not found', STATUS_CODES.NOT_FOUND);
     return success(res, deletedSubject, 'Subject deleted successfully');
   } catch (err) {
     console.error('Delete subject error:', err);
@@ -76,8 +65,10 @@ const deleteSubject = async (req, res) => {
 
 const assignSubject = async (req, res) => {
   try {
+    const schoolId = req.user.school_id;
     const { class_id, subject_id, teacher_id } = req.body;
-    const assignment = await subjectsService.assignSubjectToClass(class_id, subject_id, teacher_id);
+    const assignment = await subjectsService.assignSubjectToClass(class_id, subject_id, teacher_id, schoolId);
+    if (!assignment) return error(res, 'Kelas atau mapel tidak ditemukan di sekolah ini', STATUS_CODES.NOT_FOUND);
     return success(res, assignment, 'Subject assigned to class successfully');
   } catch (err) {
     console.error('Assign subject error:', err);
@@ -87,7 +78,8 @@ const assignSubject = async (req, res) => {
 
 const getAllClassSubjects = async (req, res) => {
   try {
-    const list = await subjectsService.getAllClassSubjects();
+    const schoolId = req.user.school_id;
+    const list = await subjectsService.getAllClassSubjects(schoolId);
     return success(res, list, 'Class subjects retrieved successfully');
   } catch (err) {
     console.error('Get class subjects error:', err);
@@ -97,8 +89,9 @@ const getAllClassSubjects = async (req, res) => {
 
 const removeClassSubject = async (req, res) => {
   try {
+    const schoolId = req.user.school_id;
     const { id } = req.params;
-    const removed = await subjectsService.removeClassSubject(id);
+    const removed = await subjectsService.removeClassSubject(id, schoolId);
     if (!removed) return error(res, 'Assignment not found', STATUS_CODES.NOT_FOUND);
     return success(res, removed, 'Assignment removed successfully');
   } catch (err) {

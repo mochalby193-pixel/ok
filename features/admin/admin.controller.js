@@ -4,7 +4,8 @@ const adminService = require('./admin.service');
 
 const getStats = async (req, res) => {
   try {
-    const stats = await adminService.getStats();
+    const schoolId = req.user.school_id;
+    const stats = await adminService.getStats(schoolId);
     return success(res, stats, 'Statistics retrieved successfully');
   } catch (err) {
     console.error('Get stats error:', err);
@@ -14,7 +15,8 @@ const getStats = async (req, res) => {
 
 const getAllStudents = async (req, res) => {
   try {
-    const students = await adminService.getAllStudents();
+    const schoolId = req.user.school_id;
+    const students = await adminService.getAllStudents(schoolId);
     return success(res, students, 'Students retrieved successfully');
   } catch (err) {
     console.error('Get students error:', err);
@@ -22,7 +24,4 @@ const getAllStudents = async (req, res) => {
   }
 };
 
-module.exports = {
-  getStats,
-  getAllStudents,
-};
+module.exports = { getStats, getAllStudents };

@@ -1,99 +1,76 @@
 const { query } = require('../../config/database');
 
-/**
- * Get all classes with student count
- */
-const getAllClasses = async () => {
+const getAllClasses = async (schoolId) => {
   const result = await query(
     `SELECT c.*, COUNT(s.id) as jumlah_siswa
      FROM classes c
      LEFT JOIN students s ON c.id = s.class_id
-     WHERE c.is_active = true
+     WHERE c.is_active = true AND c.school_id = $1
      GROUP BY c.id
-     ORDER BY c.tingkat, c.nama_kelas`
+     ORDER BY c.tingkat, c.nama_kelas`,
+    [schoolId]
   );
   return result.rows;
 };
 
-/**
- * Get class by ID
- */
-const getClassById = async (classId) => {
+const getClassById = async (classId, schoolId) => {
   const result = await query(
     `SELECT c.*, COUNT(s.id) as jumlah_siswa
      FROM classes c
      LEFT JOIN students s ON c.id = s.class_id
-     WHERE c.id = $1 AND c.is_active = true
+     WHERE c.id = $1 AND c.is_active = true AND c.school_id = $2
      GROUP BY c.id`,
-    [classId]
+    [classId, schoolId]
   );
   return result.rows[0];
 };
 
-/**
- * Create new class
- */
-const createClass = async (classData) => {
+const createClass = async (classData, schoolId) => {
   const { nama_kelas, tingkat, deskripsi } = classData;
-  
   const result = await query(
-    `INSERT INTO classes (nama_kelas, tingkat, deskripsi)
-     VALUES ($1, $2, $3)
+    `INSERT INTO classes (school_id, nama_kelas, tingkat, deskripsi)
+     VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [nama_kelas, tingkat, deskripsi || null]
+    [schoolId, nama_kelas, tingkat, deskripsi || null]
   );
-  
   return result.rows[0];
 };
 
-/**
- * Update class
- */
-const updateClass = async (classId, classData) => {
+const updateClass = async (classId, classData, schoolId) => {
   const { nama_kelas, tingkat, deskripsi, is_active } = classData;
-  
   const result = await query(
     `UPDATE classes
      SET nama_kelas = COALESCE($1, nama_kelas),
-         tingkat = COALESCE($2, tingkat),
-         deskripsi = COALESCE($3, deskripsi),
-         is_active = COALESCE($4, is_active)
-     WHERE id = $5
+         tingkat    = COALESCE($2, tingkat),
+         deskripsi  = COALESCE($3, deskripsi),
+         is_active  = COALESCE($4, is_active)
+     WHERE id = $5 AND school_id = $6
      RETURNING *`,
-    [nama_kelas, tingkat, deskripsi, is_active, classId]
+    [nama_kelas, tingkat, deskripsi, is_active, classId, schoolId]
   );
-  
   return result.rows[0];
 };
 
-/**
- * Delete class (soft delete)
- */
-const deleteClass = async (classId) => {
+const deleteClass = async (classId, schoolId) => {
   const result = await query(
-    `UPDATE classes
-     SET is_active = false
-     WHERE id = $1
+    `UPDATE classes SET is_active = false
+     WHERE id = $1 AND school_id = $2
      RETURNING *`,
-    [classId]
+    [classId, schoolId]
   );
-  
   return result.rows[0];
 };
 
-/**
- * Get students in a class
- */
-const getClassStudents = async (classId) => {
+const getClassStudents = async (classId, schoolId) => {
   const result = await query(
-    `SELECT u.id, u.nama, u.email, s.nis, s.id as student_id
+    `SELECT u.id, u.nama, u.email, s.nis, s.nisn, s.id as student_id
      FROM students s
      JOIN users u ON s.user_id = u.id
-     WHERE s.class_id = $1 AND u.is_active = true
+     JOIN classes c ON s.class_id = c.id
+     WHERE s.class_id = $1 AND c.school_id = $2 AND u.is_active = true
      ORDER BY u.nama`,
-    [classId]
+    [classId, schoolId]
   );
-  
   return result.rows;
 };
 

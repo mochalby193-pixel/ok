@@ -1,5 +1,6 @@
 // User roles
 const ROLES = {
+  PENGAWAS: 'pengawas',
   ADMIN: 'admin',
   GURU: 'guru',
   SISWA: 'siswa',
