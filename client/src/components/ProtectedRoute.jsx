@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Loader } from './Loader';
 
-export const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+export const ProtectedRoute = ({ children, allowedRoles = [], requireSuperAdmin = false }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
@@ -15,6 +15,11 @@ export const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  // Cek superadmin khusus
+  if (requireSuperAdmin && !user.is_superadmin) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {

@@ -128,6 +128,8 @@ const getCurrentUser = async (req, res) => {
       nama: user.nama,
       email: user.email,
       role: user.role,
+      school_id: user.school_id,
+      is_superadmin: user.is_superadmin || false,
       student_id: user.student_id,
       class_id: user.class_id,
       is_active: user.is_active,

@@ -34,8 +34,8 @@ import { SuperAdminRequests } from './pages/SuperAdminRequests';
 import { SessionWarning } from './components/SessionWarning';
 
 // ─── Layout wrapper: Navbar + halaman + Footer ────────────────────────────────
-const AppLayout = ({ allowedRoles }) => (
-  <ProtectedRoute allowedRoles={allowedRoles}>
+const AppLayout = ({ allowedRoles, requireSuperAdmin = false }) => (
+  <ProtectedRoute allowedRoles={allowedRoles} requireSuperAdmin={requireSuperAdmin}>
     <div className="min-h-screen flex flex-col">
       <SessionWarning />
       <Navbar />
@@ -90,7 +90,7 @@ function App() {
           </Route>
 
           {/* ── SuperAdmin Routes ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} requireSuperAdmin={true} />}>
             <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/superadmin/users" element={<SuperAdminUsers />} />
             <Route path="/superadmin/requests" element={<SuperAdminRequests />} />
