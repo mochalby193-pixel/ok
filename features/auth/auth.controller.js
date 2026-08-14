@@ -50,6 +50,7 @@ const login = async (req, res) => {
       email: user.email,
       role: user.role,
       school_id: user.school_id || null,
+      is_superadmin: user.is_superadmin || false,
       student_id: user.student_id || null,
       class_id: user.class_id || null,
     };
@@ -63,6 +64,7 @@ const login = async (req, res) => {
       email: user.email,
       role: user.role,
       school_id: user.school_id || null,
+      is_superadmin: user.is_superadmin || false,
       student_id: user.student_id,
       class_id: user.class_id,
       nisn: user.nisn || null,

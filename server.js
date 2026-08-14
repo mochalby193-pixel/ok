@@ -18,6 +18,7 @@ const studentsRoutes = require('./features/students/students.routes');
 const adminRoutes = require('./features/admin/admin.routes');
 const adminUsersRoutes = require('./features/admin/users.routes');
 const pengawasRoutes = require('./features/pengawas/pengawas.routes');
+const superadminRoutes = require('./features/superadmin/superadmin.routes');
 
 const app = express();
 
@@ -85,6 +86,7 @@ app.use('/api/students', studentsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/pengawas', pengawasRoutes);
+app.use('/api/superadmin', superadminRoutes);
 
 // 404 Handler — hanya untuk route /api yang tidak ditemukan
 app.use('/api', (req, res) => {

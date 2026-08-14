@@ -86,8 +86,37 @@ VALUES (1, 'Super Admin', 'superadmin@lms.com',
         'admin')
 ON CONFLICT (email) DO NOTHING;
 
+-- 14. Tambah flag is_superadmin ke users
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
+
+-- Set superadmin@lms.com sebagai superadmin
+UPDATE users SET is_superadmin = TRUE WHERE email = 'superadmin@lms.com';
+
+-- 15. Buat tabel user_requests (permintaan pembuatan akun dari pengawas)
+CREATE TABLE IF NOT EXISTS user_requests (
+    id           SERIAL PRIMARY KEY,
+    school_id    INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    nama         VARCHAR(100) NOT NULL,
+    email        VARCHAR(150) NOT NULL,
+    password     VARCHAR(255) NOT NULL, -- bcrypt hash
+    role         VARCHAR(20) NOT NULL DEFAULT 'admin',
+    status       VARCHAR(20) NOT NULL DEFAULT 'pending'
+                 CHECK (status IN ('pending', 'approved', 'rejected')),
+    requested_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    note         TEXT,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_requests_status    ON user_requests(status);
+CREATE INDEX IF NOT EXISTS idx_user_requests_school_id ON user_requests(school_id);
+
+DROP TRIGGER IF EXISTS update_user_requests_updated_at ON user_requests;
+CREATE TRIGGER update_user_requests_updated_at BEFORE UPDATE ON user_requests
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================================
 -- Selesai. Cek hasilnya:
--- SELECT id, nama, email, role, school_id FROM users ORDER BY id;
+-- SELECT id, nama, email, role, school_id, is_superadmin FROM users ORDER BY id;
 -- SELECT * FROM schools;
 -- ============================================================

@@ -26,6 +26,10 @@ import { ProgressSiswa } from './pages/ProgressSiswa';
 import { PengawasDashboard } from './pages/PengawasDashboard';
 import { PengawasSchoolDetail } from './pages/PengawasSchoolDetail';
 import { PengawasSchoolScores } from './pages/PengawasSchoolScores';
+import { PengawasRequests } from './pages/PengawasRequests';
+import { SuperAdminDashboard } from './pages/SuperAdminDashboard';
+import { SuperAdminUsers } from './pages/SuperAdminUsers';
+import { SuperAdminRequests } from './pages/SuperAdminRequests';
 
 import { SessionWarning } from './components/SessionWarning';
 
@@ -51,6 +55,7 @@ const RootRedirect = () => {
   if (user.role === ROLES.SISWA)    return <Navigate to="/student/dashboard" replace />;
   if (user.role === ROLES.GURU)     return <Navigate to="/guru/dashboard" replace />;
   if (user.role === ROLES.PENGAWAS) return <Navigate to="/pengawas/dashboard" replace />;
+  if (user.is_superadmin)           return <Navigate to="/superadmin/dashboard" replace />;
   return <Navigate to="/admin/dashboard" replace />;
 };
 
@@ -61,6 +66,7 @@ const PublicRoute = ({ children }) => {
     if (user.role === ROLES.SISWA)    return <Navigate to="/student/dashboard" replace />;
     if (user.role === ROLES.GURU)     return <Navigate to="/guru/dashboard" replace />;
     if (user.role === ROLES.PENGAWAS) return <Navigate to="/pengawas/dashboard" replace />;
+    if (user.is_superadmin)           return <Navigate to="/superadmin/dashboard" replace />;
     return <Navigate to="/admin/dashboard" replace />;
   }
   return children;
@@ -80,6 +86,14 @@ function App() {
             <Route path="/pengawas/dashboard" element={<PengawasDashboard />} />
             <Route path="/pengawas/schools/:id" element={<PengawasSchoolDetail />} />
             <Route path="/pengawas/schools/:id/scores" element={<PengawasSchoolScores />} />
+            <Route path="/pengawas/requests" element={<PengawasRequests />} />
+          </Route>
+
+          {/* ── SuperAdmin Routes ── */}
+          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} />}>
+            <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
+            <Route path="/superadmin/users" element={<SuperAdminUsers />} />
+            <Route path="/superadmin/requests" element={<SuperAdminRequests />} />
           </Route>
 
           {/* ── Student Routes ── */}

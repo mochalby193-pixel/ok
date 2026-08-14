@@ -5,9 +5,21 @@ import { ROLES } from '../utils/constants';
 
 const ROLE_LABEL = { pengawas: 'Pengawas', admin: 'Admin', guru: 'Guru', siswa: 'Siswa' };
 
-const getMenuItems = (role) => {
+// Badge role di navbar — superadmin override
+const getRoleLabel = (user) => {
+  if (user?.is_superadmin) return 'Super Admin';
+  return ROLE_LABEL[user?.role] || user?.role;
+};
+
+const getMenuItems = (role, is_superadmin) => {
+  if (is_superadmin) return [
+    { to: '/superadmin/dashboard', label: 'Dashboard' },
+    { to: '/superadmin/users',     label: 'Pengguna' },
+    { to: '/superadmin/requests',  label: 'Request Akun' },
+  ];
   if (role === ROLES.PENGAWAS) return [
     { to: '/pengawas/dashboard', label: 'Dashboard' },
+    { to: '/pengawas/requests',  label: 'Request Akun' },
   ];
   if (role === ROLES.ADMIN) return [
     { to: '/admin/dashboard',   label: 'Dashboard' },
@@ -68,7 +80,7 @@ export const Navbar = () => {
     navigate('/login');
   };
 
-  const menuItems = user ? getMenuItems(user.role) : [];
+  const menuItems = user ? getMenuItems(user.role, user.is_superadmin) : [];
 
   const linkClass = (to) =>
     `block text-sm font-medium transition-colors ${
@@ -113,7 +125,7 @@ export const Navbar = () => {
                   </div>
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-medium text-gray-800 leading-none">{user.nama}</p>
-                    <p className="text-xs text-gray-400">{ROLE_LABEL[user.role]}</p>
+                    <p className="text-xs text-gray-400">{getRoleLabel(user)}</p>
                   </div>
                   <svg
                     className={`w-4 h-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}

@@ -34,15 +34,16 @@ CREATE INDEX idx_schools_kode ON schools(kode);
 -- 1. USERS TABLE
 -- ============================================================
 CREATE TABLE users (
-    id         SERIAL PRIMARY KEY,
-    school_id  INTEGER REFERENCES schools(id) ON DELETE SET NULL, -- NULL untuk pengawas
-    nama       VARCHAR(100) NOT NULL,
-    email      VARCHAR(150) UNIQUE NOT NULL,
-    password   VARCHAR(255) NOT NULL,
-    role       VARCHAR(20)  NOT NULL CHECK (role IN ('pengawas','admin', 'guru', 'siswa')),
-    is_active  BOOLEAN      DEFAULT TRUE,
-    created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+    id            SERIAL PRIMARY KEY,
+    school_id     INTEGER REFERENCES schools(id) ON DELETE SET NULL,
+    nama          VARCHAR(100) NOT NULL,
+    email         VARCHAR(150) UNIQUE NOT NULL,
+    password      VARCHAR(255) NOT NULL,
+    role          VARCHAR(20)  NOT NULL CHECK (role IN ('pengawas','admin', 'guru', 'siswa')),
+    is_superadmin BOOLEAN      DEFAULT FALSE,
+    is_active     BOOLEAN      DEFAULT TRUE,
+    created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX idx_users_email ON users(email);
@@ -194,6 +195,28 @@ CREATE INDEX idx_quiz_scores_student_id ON quiz_scores(student_id);
 CREATE INDEX idx_quiz_scores_quiz_id ON quiz_scores(quiz_id);
 
 -- ============================================================
+-- 10. USER_REQUESTS TABLE
+-- Permintaan pembuatan akun dari pengawas, disetujui superadmin
+-- ============================================================
+CREATE TABLE user_requests (
+    id           SERIAL PRIMARY KEY,
+    school_id    INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+    nama         VARCHAR(100) NOT NULL,
+    email        VARCHAR(150) NOT NULL,
+    password     VARCHAR(255) NOT NULL,
+    role         VARCHAR(20) NOT NULL DEFAULT 'admin',
+    status       VARCHAR(20) NOT NULL DEFAULT 'pending'
+                 CHECK (status IN ('pending', 'approved', 'rejected')),
+    requested_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    note         TEXT,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_user_requests_status    ON user_requests(status);
+CREATE INDEX idx_user_requests_school_id ON user_requests(school_id);
+
+-- ============================================================
 -- TRIGGERS
 -- ============================================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -223,6 +246,9 @@ CREATE TRIGGER update_quizzes_updated_at BEFORE UPDATE ON quizzes
 CREATE TRIGGER update_student_progress_updated_at BEFORE UPDATE ON student_progress
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_user_requests_updated_at BEFORE UPDATE ON user_requests
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================================
 -- SEED DATA
 -- ============================================================
@@ -241,8 +267,8 @@ INSERT INTO users (school_id, nama, email, password, role) VALUES
 
 -- Super Admin (school_id = 1)
 -- superadmin@lms.com / ADMIN123
-INSERT INTO users (school_id, nama, email, password, role) VALUES
-(1, 'Super Admin', 'superadmin@lms.com', '$2b$10$kP8/ItWB.HOt8xNNoijJJeVXkqyuJxwEeP1g5qHQJWvRoR3Bqz1Aa', 'admin');
+INSERT INTO users (school_id, nama, email, password, role, is_superadmin) VALUES
+(1, 'Super Admin', 'superadmin@lms.com', '$2b$10$kP8/ItWB.HOt8xNNoijJJeVXkqyuJxwEeP1g5qHQJWvRoR3Bqz1Aa', 'admin', TRUE);
 
 -- Admin sekolah pertama (school_id = 1)
 -- admin@lms.com / admin123
