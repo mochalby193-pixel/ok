@@ -39,8 +39,7 @@ CREATE TABLE users (
     nama          VARCHAR(100) NOT NULL,
     email         VARCHAR(150) UNIQUE NOT NULL,
     password      VARCHAR(255) NOT NULL,
-    role          VARCHAR(20)  NOT NULL CHECK (role IN ('pengawas','admin', 'guru', 'siswa')),
-    is_superadmin BOOLEAN      DEFAULT FALSE,
+    role          VARCHAR(20)  NOT NULL CHECK (role IN ('superadmin','pengawas','admin','guru','siswa')),
     is_active     BOOLEAN      DEFAULT TRUE,
     created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
@@ -267,8 +266,8 @@ INSERT INTO users (school_id, nama, email, password, role) VALUES
 
 -- Super Admin (school_id = 1)
 -- superadmin@lms.com / ADMIN123
-INSERT INTO users (school_id, nama, email, password, role, is_superadmin) VALUES
-(1, 'Super Admin', 'superadmin@lms.com', '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.', 'admin', TRUE);
+INSERT INTO users (school_id, nama, email, password, role) VALUES
+(1, 'Super Admin', 'superadmin@lms.com', '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.', 'superadmin');
 
 -- Admin sekolah pertama (school_id = 1)
 -- admin@lms.com / admin123

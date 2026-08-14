@@ -34,8 +34,8 @@ import { SuperAdminRequests } from './pages/SuperAdminRequests';
 import { SessionWarning } from './components/SessionWarning';
 
 // ─── Layout wrapper: Navbar + halaman + Footer ────────────────────────────────
-const AppLayout = ({ allowedRoles, requireSuperAdmin = false, superAdminBlocked = false }) => (
-  <ProtectedRoute allowedRoles={allowedRoles} requireSuperAdmin={requireSuperAdmin} superAdminBlocked={superAdminBlocked}>
+const AppLayout = ({ allowedRoles }) => (
+  <ProtectedRoute allowedRoles={allowedRoles}>
     <div className="min-h-screen flex flex-col">
       <SessionWarning />
       <Navbar />
@@ -52,10 +52,10 @@ const RootRedirect = () => {
   const { user, isAuthenticated, loading } = useAuth();
   if (loading) return null;
   if (!isAuthenticated) return <LandingPage />;
-  if (user.role === ROLES.SISWA)    return <Navigate to="/student/dashboard" replace />;
-  if (user.role === ROLES.GURU)     return <Navigate to="/guru/dashboard" replace />;
-  if (user.role === ROLES.PENGAWAS) return <Navigate to="/pengawas/dashboard" replace />;
-  if (user.is_superadmin)           return <Navigate to="/superadmin/dashboard" replace />;
+  if (user.role === ROLES.SISWA)       return <Navigate to="/student/dashboard" replace />;
+  if (user.role === ROLES.GURU)        return <Navigate to="/guru/dashboard" replace />;
+  if (user.role === ROLES.PENGAWAS)    return <Navigate to="/pengawas/dashboard" replace />;
+  if (user.role === ROLES.SUPERADMIN)  return <Navigate to="/superadmin/dashboard" replace />;
   return <Navigate to="/admin/dashboard" replace />;
 };
 
@@ -63,10 +63,10 @@ const PublicRoute = ({ children }) => {
   const { user, isAuthenticated, loading } = useAuth();
   if (loading) return null;
   if (isAuthenticated) {
-    if (user.role === ROLES.SISWA)    return <Navigate to="/student/dashboard" replace />;
-    if (user.role === ROLES.GURU)     return <Navigate to="/guru/dashboard" replace />;
-    if (user.role === ROLES.PENGAWAS) return <Navigate to="/pengawas/dashboard" replace />;
-    if (user.is_superadmin)           return <Navigate to="/superadmin/dashboard" replace />;
+    if (user.role === ROLES.SISWA)      return <Navigate to="/student/dashboard" replace />;
+    if (user.role === ROLES.GURU)       return <Navigate to="/guru/dashboard" replace />;
+    if (user.role === ROLES.PENGAWAS)   return <Navigate to="/pengawas/dashboard" replace />;
+    if (user.role === ROLES.SUPERADMIN) return <Navigate to="/superadmin/dashboard" replace />;
     return <Navigate to="/admin/dashboard" replace />;
   }
   return children;
@@ -90,7 +90,7 @@ function App() {
           </Route>
 
           {/* ── SuperAdmin Routes ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} requireSuperAdmin={true} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.SUPERADMIN]} />}>
             <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/superadmin/users" element={<SuperAdminUsers />} />
             <Route path="/superadmin/requests" element={<SuperAdminRequests />} />
@@ -111,13 +111,8 @@ function App() {
             <Route path="/guru/progress-siswa" element={<ProgressSiswa />} />
           </Route>
 
-          {/* ── Guru + Admin shared Routes ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.GURU, ROLES.ADMIN]} superAdminBlocked={true} />}>
-            <Route path="/guru/rekap-nilai" element={<RekapNilai />} />
-          </Route>
-
           {/* ── Admin Routes ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} requireSuperAdmin={false} superAdminBlocked={true} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.ADMIN]} />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/classes" element={<ManageClasses />} />
             <Route path="/admin/subjects" element={<ManageSubjects />} />
@@ -125,8 +120,13 @@ function App() {
             <Route path="/admin/assignments" element={<ManageAssignments />} />
           </Route>
 
+          {/* ── Guru + Admin shared Routes ── */}
+          <Route element={<AppLayout allowedRoles={[ROLES.GURU, ROLES.ADMIN]} />}>
+            <Route path="/guru/rekap-nilai" element={<RekapNilai />} />
+          </Route>
+
           {/* ── Profile (semua role) ── */}
-          <Route element={<AppLayout allowedRoles={[ROLES.PENGAWAS, ROLES.ADMIN, ROLES.GURU, ROLES.SISWA]} />}>
+          <Route element={<AppLayout allowedRoles={[ROLES.SUPERADMIN, ROLES.PENGAWAS, ROLES.ADMIN, ROLES.GURU, ROLES.SISWA]} />}>
             <Route path="/profile" element={<Profile />} />
           </Route>
 

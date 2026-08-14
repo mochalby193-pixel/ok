@@ -2,12 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Loader } from './Loader';
 
-export const ProtectedRoute = ({
-  children,
-  allowedRoles = [],
-  requireSuperAdmin = false,
-  superAdminBlocked = false, // blokir superadmin dari halaman admin biasa
-}) => {
+export const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
@@ -22,17 +17,6 @@ export const ProtectedRoute = ({
     return <Navigate to="/login" replace />;
   }
 
-  // Superadmin tidak boleh akses halaman admin biasa
-  if (superAdminBlocked && user.is_superadmin) {
-    return <Navigate to="/superadmin/dashboard" replace />;
-  }
-
-  // Hanya superadmin yang boleh akses
-  if (requireSuperAdmin && !user.is_superadmin) {
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  // Cek role
   if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" replace />;
   }

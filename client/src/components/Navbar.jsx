@@ -3,16 +3,10 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ROLES } from '../utils/constants';
 
-const ROLE_LABEL = { pengawas: 'Pengawas', admin: 'Admin', guru: 'Guru', siswa: 'Siswa' };
+const ROLE_LABEL = { superadmin: 'Super Admin', pengawas: 'Pengawas', admin: 'Admin', guru: 'Guru', siswa: 'Siswa' };
 
-// Badge role di navbar — superadmin override
-const getRoleLabel = (user) => {
-  if (user?.is_superadmin) return 'Super Admin';
-  return ROLE_LABEL[user?.role] || user?.role;
-};
-
-const getMenuItems = (role, is_superadmin) => {
-  if (is_superadmin) return [
+const getMenuItems = (role) => {
+  if (role === ROLES.SUPERADMIN) return [
     { to: '/superadmin/dashboard', label: 'Dashboard' },
     { to: '/superadmin/users',     label: 'Pengguna' },
     { to: '/superadmin/requests',  label: 'Request Akun' },
@@ -80,7 +74,7 @@ export const Navbar = () => {
     navigate('/login');
   };
 
-  const menuItems = user ? getMenuItems(user.role, user.is_superadmin) : [];
+  const menuItems = user ? getMenuItems(user.role) : [];
 
   const linkClass = (to) =>
     `block text-sm font-medium transition-colors ${
@@ -125,7 +119,7 @@ export const Navbar = () => {
                   </div>
                   <div className="text-left hidden lg:block">
                     <p className="text-sm font-medium text-gray-800 leading-none">{user.nama}</p>
-                    <p className="text-xs text-gray-400">{getRoleLabel(user)}</p>
+                    <p className="text-xs text-gray-400">{ROLE_LABEL[user.role] || user.role}</p>
                   </div>
                   <svg
                     className={`w-4 h-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}

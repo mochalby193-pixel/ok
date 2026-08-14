@@ -133,7 +133,6 @@ export const SuperAdminUsers = () => {
                 <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="font-medium text-gray-800">{u.nama}</div>
-                    {u.is_superadmin && <span className="text-xs bg-slate-800 text-white px-1.5 py-0.5 rounded">superadmin</span>}
                   </td>
                   <td className="px-4 py-3 text-gray-600 text-xs">{u.email}</td>
                   <td className="px-4 py-3">
@@ -149,7 +148,7 @@ export const SuperAdminUsers = () => {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1.5">
-                      {!u.is_superadmin && (
+                      {u.role !== 'superadmin' && (
                         <>
                           <button onClick={() => openEdit(u)}
                             className="text-xs px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium transition-colors">

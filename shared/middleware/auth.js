@@ -77,15 +77,9 @@ const pengawasOnly = authorize(ROLES.PENGAWAS);
 const pengawasOrAdmin = authorize(ROLES.PENGAWAS, ROLES.ADMIN);
 
 /**
- * Middleware for superadmin only (role=admin AND is_superadmin=true)
+ * Middleware for superadmin only
  */
-const superAdminOnly = (req, res, next) => {
-  if (!req.user) return error(res, 'User not authenticated', STATUS_CODES.UNAUTHORIZED);
-  if (req.user.role !== ROLES.ADMIN || !req.user.is_superadmin) {
-    return error(res, 'Akses hanya untuk Super Admin', STATUS_CODES.FORBIDDEN);
-  }
-  next();
-};
+const superAdminOnly = authorize(ROLES.SUPERADMIN);
 
 module.exports = {
   authenticate,

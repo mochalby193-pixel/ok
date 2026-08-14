@@ -40,10 +40,10 @@ SELECT setval('schools_id_seq', (SELECT MAX(id) FROM schools));
 ALTER TABLE users
     ADD COLUMN IF NOT EXISTS school_id INTEGER REFERENCES schools(id) ON DELETE SET NULL;
 
--- 4. Update role CHECK constraint untuk users (tambah 'pengawas')
+-- 4. Update role CHECK constraint untuk users (tambah 'pengawas' dan 'superadmin')
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 ALTER TABLE users ADD CONSTRAINT users_role_check
-    CHECK (role IN ('pengawas', 'admin', 'guru', 'siswa'));
+    CHECK (role IN ('superadmin', 'pengawas', 'admin', 'guru', 'siswa'));
 
 -- 5. Set semua user lama ke school_id = 1
 UPDATE users SET school_id = 1 WHERE school_id IS NULL;
@@ -80,19 +80,19 @@ VALUES (NULL, 'Pengawas', 'pengawas@lms.com',
         'pengawas')
 ON CONFLICT (email) DO NOTHING;
 
--- 13. Insert superadmin (password: ADMIN123)
+-- 13. Insert/update superadmin (password: ADMIN123) dengan role 'superadmin'
 INSERT INTO users (school_id, nama, email, password, role)
 VALUES (1, 'Super Admin', 'superadmin@lms.com',
         '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.',
-        'admin')
+        'superadmin')
 ON CONFLICT (email) DO UPDATE SET
+    role     = 'superadmin',
     password = '$2b$10$/vZidNtY8llqgB0ETF/BNO5TNJRhBm4o4a0i0dg05h6aKRSxGCtL.';
 
--- 14. Tambah flag is_superadmin ke users
-ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
+-- 14. Hapus kolom is_superadmin jika ada (tidak diperlukan lagi)
+ALTER TABLE users DROP COLUMN IF EXISTS is_superadmin;
 
--- Set superadmin@lms.com sebagai superadmin
-UPDATE users SET is_superadmin = TRUE WHERE email = 'superadmin@lms.com';
+-- 15. Set semua user yang sebelumnya is_superadmin=true ke role superadmin sudah dilakukan di step 13
 
 -- 15. Buat tabel user_requests (permintaan pembuatan akun dari pengawas)
 CREATE TABLE IF NOT EXISTS user_requests (

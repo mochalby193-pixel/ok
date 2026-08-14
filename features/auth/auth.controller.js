@@ -50,13 +50,12 @@ const login = async (req, res) => {
       email: user.email,
       role: user.role,
       school_id: user.school_id || null,
-      is_superadmin: user.is_superadmin || false,
       student_id: user.student_id || null,
       class_id: user.class_id || null,
     };
-    
+
     const token = generateToken(tokenPayload);
-    
+
     // Return user data (without password) and token
     const userData = {
       id: user.id,
@@ -64,7 +63,6 @@ const login = async (req, res) => {
       email: user.email,
       role: user.role,
       school_id: user.school_id || null,
-      is_superadmin: user.is_superadmin || false,
       student_id: user.student_id,
       class_id: user.class_id,
       nisn: user.nisn || null,
@@ -129,7 +127,6 @@ const getCurrentUser = async (req, res) => {
       email: user.email,
       role: user.role,
       school_id: user.school_id,
-      is_superadmin: user.is_superadmin || false,
       student_id: user.student_id,
       class_id: user.class_id,
       is_active: user.is_active,

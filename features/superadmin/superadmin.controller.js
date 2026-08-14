@@ -25,11 +25,10 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    // Proteksi: tidak boleh edit superadmin lain
     const target = await svc.getUserById(req.params.id);
     if (!target) return error(res, 'User not found', STATUS_CODES.NOT_FOUND);
-    if (target.is_superadmin && target.id !== req.user.id) {
-      return error(res, 'Tidak bisa edit akun superadmin lain', STATUS_CODES.FORBIDDEN);
+    if (target.role === 'superadmin') {
+      return error(res, 'Tidak bisa edit akun superadmin', STATUS_CODES.FORBIDDEN);
     }
     const updated = await svc.updateUser(req.params.id, req.body);
     return success(res, updated, 'User updated');
@@ -44,7 +43,7 @@ const deleteUser = async (req, res) => {
       return error(res, 'Tidak bisa menonaktifkan akun sendiri', STATUS_CODES.BAD_REQUEST);
     }
     const target = await svc.getUserById(req.params.id);
-    if (target?.is_superadmin) {
+    if (target?.role === 'superadmin') {
       return error(res, 'Tidak bisa menonaktifkan akun superadmin', STATUS_CODES.FORBIDDEN);
     }
     await svc.deleteUser(req.params.id);

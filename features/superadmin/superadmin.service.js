@@ -5,7 +5,7 @@ const { query, getClient } = require('../../config/database');
 
 const getAllUsers = async ({ role, search, school_id } = {}) => {
   let sql = `
-    SELECT u.id, u.nama, u.email, u.role, u.is_active, u.is_superadmin,
+    SELECT u.id, u.nama, u.email, u.role, u.is_active,
            u.school_id, u.created_at,
            sch.nama AS nama_sekolah,
            s.id AS student_id, s.nis, s.nisn,
@@ -14,7 +14,7 @@ const getAllUsers = async ({ role, search, school_id } = {}) => {
     LEFT JOIN schools sch ON u.school_id = sch.id
     LEFT JOIN students s  ON u.id = s.user_id
     LEFT JOIN classes  c  ON s.class_id = c.id
-    WHERE 1=1
+    WHERE u.role != 'superadmin'
   `;
   const params = [];
 
@@ -29,7 +29,7 @@ const getAllUsers = async ({ role, search, school_id } = {}) => {
 
 const getUserById = async (id) => {
   const result = await query(
-    `SELECT u.id, u.nama, u.email, u.role, u.is_active, u.is_superadmin,
+    `SELECT u.id, u.nama, u.email, u.role, u.is_active,
             u.school_id, sch.nama AS nama_sekolah, u.created_at,
             s.id AS student_id, s.nis, s.nisn, s.class_id, c.nama_kelas
      FROM users u
@@ -43,7 +43,7 @@ const getUserById = async (id) => {
 };
 
 const updateUser = async (id, { nama, email, role, is_active, password }) => {
-  // Tidak boleh edit superadmin lain atau diri sendiri jadi non-superadmin
+  // Tidak boleh edit superadmin
   const client = await getClient();
   try {
     await client.query('BEGIN');

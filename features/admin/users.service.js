@@ -9,7 +9,7 @@ const getAllUsers = async ({ role, search, class_id, schoolId } = {}) => {
     FROM users u
     LEFT JOIN students s ON u.id = s.user_id
     LEFT JOIN classes  c ON s.class_id = c.id
-    WHERE u.school_id = $1 AND u.role != 'pengawas'
+    WHERE u.school_id = $1 AND u.role NOT IN ('pengawas','superadmin')
   `;
   const params = [schoolId];
 
