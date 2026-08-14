@@ -11,6 +11,7 @@ const EMPTY_FORM = {
   class_subject_id: '',  // resolved cs.id → dikirim ke backend
   judul_bab: '',
   media_url: '',
+  pdf_url: '',           // Google Drive / direct PDF URL
 };
 
 export const ManageLessons = () => {
@@ -33,13 +34,11 @@ export const ManageLessons = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
-  const [pdfFile, setPdfFile] = useState(null);
   const [excelFile, setExcelFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [importSuccess, setImportSuccess] = useState('');
 
-  const pdfInputRef = useRef(null);
   const excelInputRef = useRef(null);
 
   // Subjects for selected class
@@ -65,11 +64,9 @@ export const ManageLessons = () => {
   const resetForm = () => {
     setFormData(EMPTY_FORM);
     setEditingId(null);
-    setPdfFile(null);
     setExcelFile(null);
     setFormError('');
     setImportSuccess('');
-    if (pdfInputRef.current) pdfInputRef.current.value = '';
     if (excelInputRef.current) excelInputRef.current.value = '';
   };
 
@@ -87,8 +84,8 @@ export const ManageLessons = () => {
       class_subject_id: String(lesson.class_subject_id),
       judul_bab: lesson.judul_bab,
       media_url: lesson.media_url || '',
+      pdf_url: lesson.pdf_url || '',
     });
-    setPdfFile(null);
     setExcelFile(null);
     setFormError('');
     setShowForm(true);
@@ -111,9 +108,9 @@ export const ManageLessons = () => {
       data.append('class_subject_id', formData.class_subject_id);
       data.append('judul_bab', formData.judul_bab.trim());
       data.append('media_url', formData.media_url.trim());
+      data.append('pdf_url', formData.pdf_url.trim());
       data.append('is_published', String(isPublished));
       data.append('konten_teks', ' ');
-      if (pdfFile) data.append('pdf_file', pdfFile);
 
       let savedLesson;
       if (editingId) {
@@ -275,34 +272,22 @@ export const ManageLessons = () => {
               />
             </div>
 
-            {/* 4. Import PDF */}
+            {/* 4. URL PDF Google Drive */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                📄 Impor Materi (PDF)
+                📄 URL PDF (Google Drive)
               </label>
-              <div className="flex items-center gap-3">
-                <input
-                  ref={pdfInputRef}
-                  type="file"
-                  accept=".pdf"
-                  onChange={(e) => setPdfFile(e.target.files[0] || null)}
-                  className="block w-full text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
-                {pdfFile && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPdfFile(null);
-                      if (pdfInputRef.current) pdfInputRef.current.value = '';
-                    }}
-                    className="text-red-500 text-xs hover:underline whitespace-nowrap"
-                  >
-                    ✕ Hapus
-                  </button>
-                )}
-              </div>
-              {pdfFile && <p className="text-xs text-gray-500 mt-1">📎 {pdfFile.name}</p>}
-              <p className="text-xs text-gray-400 mt-1">Maks. 20 MB. Format: PDF.</p>
+              <input
+                type="url"
+                value={formData.pdf_url}
+                onChange={(e) => setFormData({ ...formData, pdf_url: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="https://drive.google.com/file/d/..."
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                Pastikan file Google Drive diset <strong>Anyone with the link can view</strong>.
+                Salin link share dari Google Drive lalu paste di sini.
+              </p>
             </div>
 
             {/* 5. URL YouTube */}

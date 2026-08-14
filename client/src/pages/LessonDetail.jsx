@@ -8,14 +8,18 @@ import { Button } from '../components/Button';
 import { QuizCard } from '../components/QuizCard';
 import { ConfirmModal } from '../components/ConfirmModal';
 
-// Convert a relative /uploads/... path to an absolute URL pointing to the backend
+// Convert a relative /uploads/... path or Google Drive URL to embeddable URL
 const getFileUrl = (url) => {
   if (!url) return null;
+  // Google Drive share link → convert to preview/embed URL
+  // Format: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if (driveMatch) {
+    return `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
+  }
   // Already absolute URL — return as-is
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  // In development: Vite proxies /uploads → localhost:5000
-  // In production: Express serves /uploads directly (same origin)
-  // Either way, a root-relative path works correctly
+  // Root-relative path (legacy uploads)
   return url;
 };
 
@@ -254,25 +258,17 @@ export const LessonDetail = () => {
               className="relative w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-100"
               style={{ height: '520px' }}
             >
-              {/* Primary: native <object> tag — most reliable for same-origin PDF */}
-              <object
-                data={pdfUrl}
-                type="application/pdf"
+              <iframe
+                src={pdfUrl}
                 className="w-full h-full"
+                title="PDF Materi"
+                allow="autoplay"
                 onLoad={() => setPdfViewed(true)}
-              >
-                {/* Fallback: embed tag */}
-                <embed
-                  src={pdfUrl}
-                  type="application/pdf"
-                  className="w-full h-full"
-                  onLoad={() => setPdfViewed(true)}
-                />
-              </object>
+              />
             </div>
             <div className="flex items-center gap-4 mt-3">
               <a
-                href={pdfUrl}
+                href={lesson?.pdf_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block text-sm text-primary hover:underline"
